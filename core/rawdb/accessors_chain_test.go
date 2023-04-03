@@ -784,7 +784,7 @@ func TestParseLegacyReceiptRLP(t *testing.T) {
 	gasUsed = gasUsed.Add(gasUsed, big.NewInt(math.MaxInt64))
 	sanityCheck := (&big.Int{}).SetUint64(gasUsed.Uint64())
 	require.NotEqual(t, gasUsed, sanityCheck)
-	receipt := types.LegacyOptimismStoredReceiptRLP{
+	receipt := types.LegacyPessimismStoredReceiptRLP{
 		CumulativeGasUsed: 1,
 		Logs: []*types.LogForStorage{
 			{Address: common.BytesToAddress([]byte{0x11})},

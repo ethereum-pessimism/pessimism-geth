@@ -140,18 +140,18 @@ func TestConfigRules(t *testing.T) {
 func TestConfigRulesRegolith(t *testing.T) {
 	c := &ChainConfig{
 		RegolithTime: newUint64(500),
-		Optimism:     &OptimismConfig{},
+		Pessimism:     &PessimismConfig{},
 	}
 	var stamp uint64
-	if r := c.Rules(big.NewInt(0), true, stamp); r.IsOptimismRegolith {
+	if r := c.Rules(big.NewInt(0), true, stamp); r.IsPessimismRegolith {
 		t.Errorf("expected %v to not be regolith", stamp)
 	}
 	stamp = 500
-	if r := c.Rules(big.NewInt(0), true, stamp); !r.IsOptimismRegolith {
+	if r := c.Rules(big.NewInt(0), true, stamp); !r.IsPessimismRegolith {
 		t.Errorf("expected %v to be regolith", stamp)
 	}
 	stamp = math.MaxInt64
-	if r := c.Rules(big.NewInt(0), true, stamp); !r.IsOptimismRegolith {
+	if r := c.Rules(big.NewInt(0), true, stamp); !r.IsPessimismRegolith {
 		t.Errorf("expected %v to be regolith", stamp)
 	}
 }

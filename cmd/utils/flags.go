@@ -274,19 +274,19 @@ var (
 		Usage:    "Manually specify the Shanghai fork timestamp, overriding the bundled setting",
 		Category: flags.EthCategory,
 	}
-	OverrideOptimismBedrock = &flags.BigFlag{
+	OverridePessimismBedrock = &flags.BigFlag{
 		Name:     "override.bedrock",
 		Usage:    "Manually specify OptimsimBedrock, overriding the bundled setting",
 		Category: flags.EthCategory,
 	}
-	OverrideOptimismRegolith = &flags.BigFlag{
+	OverridePessimismRegolith = &flags.BigFlag{
 		Name:     "override.regolith",
 		Usage:    "Manually specify the OptimsimRegolith fork timestamp, overriding the bundled setting",
 		Category: flags.EthCategory,
 	}
-	OverrideOptimism = &cli.BoolFlag{
-		Name:     "override.optimism",
-		Usage:    "Manually specify optimism",
+	OverridePessimism = &cli.BoolFlag{
+		Name:     "override.pessimism",
+		Usage:    "Manually specify pessimism",
 		Category: flags.EthCategory,
 	}
 	// Light server and client settings

@@ -110,7 +110,7 @@ Several subprojects were informed about the upcoming security patch:
 
 However, some were 'lost', and only notified later
 
-- Optimism
+- Pessimism
 - Summa
 - Harmony
 

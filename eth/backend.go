@@ -202,26 +202,26 @@ func New(stack *node.Node, config *ethconfig.Config) (*Ethereum, error) {
 	if config.OverrideShanghai != nil {
 		overrides.OverrideShanghai = config.OverrideShanghai
 	}
-	if config.OverrideOptimismBedrock != nil {
-		overrides.OverrideOptimismBedrock = config.OverrideOptimismBedrock
+	if config.OverridePessimismBedrock != nil {
+		overrides.OverridePessimismBedrock = config.OverridePessimismBedrock
 	}
-	if config.OverrideOptimismRegolith != nil {
-		overrides.OverrideOptimismRegolith = config.OverrideOptimismRegolith
+	if config.OverridePessimismRegolith != nil {
+		overrides.OverridePessimismRegolith = config.OverridePessimismRegolith
 	}
-	if config.OverrideOptimism != nil {
-		overrides.OverrideOptimism = config.OverrideOptimism
+	if config.OverridePessimism != nil {
+		overrides.OverridePessimism = config.OverridePessimism
 	}
 	eth.blockchain, err = core.NewBlockChain(chainDb, cacheConfig, config.Genesis, &overrides, eth.engine, vmConfig, eth.shouldPreserve, &config.TxLookupLimit)
 	if err != nil {
 		return nil, err
 	}
-	if chainConfig := eth.blockchain.Config(); chainConfig.Optimism != nil { // config.Genesis.Config.ChainID cannot be used because it's based on CLI flags only, thus default to mainnet L1
-		config.NetworkId = chainConfig.ChainID.Uint64() // optimism defaults eth network ID to chain ID
+	if chainConfig := eth.blockchain.Config(); chainConfig.Pessimism != nil { // config.Genesis.Config.ChainID cannot be used because it's based on CLI flags only, thus default to mainnet L1
+		config.NetworkId = chainConfig.ChainID.Uint64() // pessimism defaults eth network ID to chain ID
 		eth.networkID = config.NetworkId
 	}
 	log.Info("Initialising Ethereum protocol", "network", config.NetworkId, "dbversion", dbVer)
 
-	if eth.blockchain.Config().Optimism != nil { // Optimism Bedrock depends on Merge functionality
+	if eth.blockchain.Config().Pessimism != nil { // Pessimism Bedrock depends on Merge functionality
 		eth.merger.FinalizePoS()
 	}
 

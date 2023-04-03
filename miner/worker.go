@@ -796,7 +796,7 @@ func (w *worker) makeEnv(parent *types.Header, header *types.Header, coinbase co
 	// Retrieve the parent state to execute on top and start a prefetcher for
 	// the miner to speed block sealing up a bit.
 	state, err := w.chain.StateAt(parent.Root)
-	if err != nil && w.chainConfig.Optimism != nil { // Allow the miner to reorg its own chain arbitrarily deep
+	if err != nil && w.chainConfig.Pessimism != nil { // Allow the miner to reorg its own chain arbitrarily deep
 		if historicalBackend, ok := w.eth.(BackendWithHistoricalState); ok {
 			var release tracers.StateReleaseFunc
 			parentBlock := w.eth.BlockChain().GetBlockByHash(parent.Hash())
@@ -1029,7 +1029,7 @@ func (w *worker) prepareWork(genParams *generateParams) (*environment, error) {
 		Coinbase:   genParams.coinbase,
 	}
 	// Set the extra field.
-	if len(w.extra) != 0 && w.chainConfig.Optimism == nil { // Optimism chains must not set any extra data.
+	if len(w.extra) != 0 && w.chainConfig.Pessimism == nil { // Pessimism chains must not set any extra data.
 		header.Extra = w.extra
 	}
 	// Set the randomness field from the beacon chain if it's available.
@@ -1046,8 +1046,8 @@ func (w *worker) prepareWork(genParams *generateParams) (*environment, error) {
 	}
 	if genParams.gasLimit != nil { // override gas limit if specified
 		header.GasLimit = *genParams.gasLimit
-	} else if w.chain.Config().Optimism != nil && w.config.GasCeil != 0 {
-		// configure the gas limit of pending blocks with the miner gas limit config when using optimism
+	} else if w.chain.Config().Pessimism != nil && w.config.GasCeil != 0 {
+		// configure the gas limit of pending blocks with the miner gas limit config when using pessimism
 		header.GasLimit = w.config.GasCeil
 	}
 	// Run the consensus preparation with the default or customized consensus engine.

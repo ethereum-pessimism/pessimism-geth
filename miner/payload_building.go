@@ -41,9 +41,9 @@ type BuildPayloadArgs struct {
 	Random       common.Hash       // The provided randomness value
 	Withdrawals  types.Withdrawals // The provided withdrawals
 
-	NoTxPool     bool                 // Optimism addition: option to disable tx pool contents from being included
-	Transactions []*types.Transaction // Optimism addition: txs forced into the block via engine API
-	GasLimit     *uint64              // Optimism addition: override gas limit of the block to build
+	NoTxPool     bool                 // Pessimism addition: option to disable tx pool contents from being included
+	Transactions []*types.Transaction // Pessimism addition: txs forced into the block via engine API
+	GasLimit     *uint64              // Pessimism addition: override gas limit of the block to build
 }
 
 // Id computes an 8-byte identifier by hashing the components of the payload arguments.

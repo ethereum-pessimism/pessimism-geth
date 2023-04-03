@@ -638,7 +638,7 @@ func (s *BlockChainAPI) GetBalance(ctx context.Context, address common.Address, 
 		return nil, err
 	}
 
-	if s.b.ChainConfig().IsOptimismPreBedrock(header.Number) {
+	if s.b.ChainConfig().IsPessimismPreBedrock(header.Number) {
 		if s.b.HistoricalRPCService() != nil {
 			var res hexutil.Big
 			err := s.b.HistoricalRPCService().CallContext(ctx, &res, "eth_getBalance", address, blockNrOrHash)
@@ -682,7 +682,7 @@ func (s *BlockChainAPI) GetProof(ctx context.Context, address common.Address, st
 	if err != nil {
 		return nil, err
 	}
-	if s.b.ChainConfig().IsOptimismPreBedrock(header.Number) {
+	if s.b.ChainConfig().IsPessimismPreBedrock(header.Number) {
 		if s.b.HistoricalRPCService() != nil {
 			var res AccountResult
 			err := s.b.HistoricalRPCService().CallContext(ctx, &res, "eth_getProof", address, storageKeys, blockNrOrHash)
@@ -879,7 +879,7 @@ func (s *BlockChainAPI) GetCode(ctx context.Context, address common.Address, blo
 		return nil, err
 	}
 
-	if s.b.ChainConfig().IsOptimismPreBedrock(header.Number) {
+	if s.b.ChainConfig().IsPessimismPreBedrock(header.Number) {
 		if s.b.HistoricalRPCService() != nil {
 			var res hexutil.Bytes
 			err := s.b.HistoricalRPCService().CallContext(ctx, &res, "eth_getCode", address, blockNrOrHash)
@@ -910,7 +910,7 @@ func (s *BlockChainAPI) GetStorageAt(ctx context.Context, address common.Address
 		return nil, err
 	}
 
-	if s.b.ChainConfig().IsOptimismPreBedrock(header.Number) {
+	if s.b.ChainConfig().IsPessimismPreBedrock(header.Number) {
 		if s.b.HistoricalRPCService() != nil {
 			var res hexutil.Bytes
 			err := s.b.HistoricalRPCService().CallContext(ctx, &res, "eth_getStorageAt", address, hexKey, blockNrOrHash)
@@ -1140,7 +1140,7 @@ func (s *BlockChainAPI) Call(ctx context.Context, args TransactionArgs, blockNrO
 		return nil, err
 	}
 
-	if s.b.ChainConfig().IsOptimismPreBedrock(header.Number) {
+	if s.b.ChainConfig().IsPessimismPreBedrock(header.Number) {
 		if s.b.HistoricalRPCService() != nil {
 			var res hexutil.Bytes
 			err := s.b.HistoricalRPCService().CallContext(ctx, &res, "eth_call", args, blockNrOrHash, overrides)
@@ -1297,7 +1297,7 @@ func (s *BlockChainAPI) EstimateGas(ctx context.Context, args TransactionArgs, b
 		return 0, err
 	}
 
-	if s.b.ChainConfig().IsOptimismPreBedrock(header.Number) {
+	if s.b.ChainConfig().IsPessimismPreBedrock(header.Number) {
 		if s.b.HistoricalRPCService() != nil {
 			var res hexutil.Uint64
 			err := s.b.HistoricalRPCService().CallContext(ctx, &res, "eth_estimateGas", args, blockNrOrHash)
@@ -1573,7 +1573,7 @@ func (s *BlockChainAPI) CreateAccessList(ctx context.Context, args TransactionAr
 	}
 
 	header, err := headerByNumberOrHash(ctx, s.b, bNrOrHash)
-	if err == nil && header != nil && s.b.ChainConfig().IsOptimismPreBedrock(header.Number) {
+	if err == nil && header != nil && s.b.ChainConfig().IsPessimismPreBedrock(header.Number) {
 		if s.b.HistoricalRPCService() != nil {
 			var res accessListResult
 			err := s.b.HistoricalRPCService().CallContext(ctx, &res, "eth_createAccessList", args, blockNrOrHash)
@@ -1744,7 +1744,7 @@ func (s *TransactionAPI) GetTransactionCount(ctx context.Context, address common
 		return nil, err
 	}
 
-	if s.b.ChainConfig().IsOptimismPreBedrock(header.Number) {
+	if s.b.ChainConfig().IsPessimismPreBedrock(header.Number) {
 		if s.b.HistoricalRPCService() != nil {
 			var res hexutil.Uint64
 			err := s.b.HistoricalRPCService().CallContext(ctx, &res, "eth_getTransactionCount", address, blockNrOrHash)
@@ -1846,13 +1846,13 @@ func (s *TransactionAPI) GetTransactionReceipt(ctx context.Context, hash common.
 		"effectiveGasPrice": (*hexutil.Big)(receipt.EffectiveGasPrice),
 	}
 
-	if s.b.ChainConfig().Optimism != nil && !tx.IsDepositTx() {
+	if s.b.ChainConfig().Pessimism != nil && !tx.IsDepositTx() {
 		fields["l1GasPrice"] = (*hexutil.Big)(receipt.L1GasPrice)
 		fields["l1GasUsed"] = (*hexutil.Big)(receipt.L1GasUsed)
 		fields["l1Fee"] = (*hexutil.Big)(receipt.L1Fee)
 		fields["l1FeeScalar"] = receipt.FeeScalar.String()
 	}
-	if s.b.ChainConfig().Optimism != nil && tx.IsDepositTx() && receipt.DepositNonce != nil {
+	if s.b.ChainConfig().Pessimism != nil && tx.IsDepositTx() && receipt.DepositNonce != nil {
 		fields["depositNonce"] = hexutil.Uint64(*receipt.DepositNonce)
 	}
 

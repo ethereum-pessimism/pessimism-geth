@@ -91,7 +91,7 @@ type receiptMarshaling struct {
 	BlockNumber       *hexutil.Big
 	TransactionIndex  hexutil.Uint
 
-	// Optimism: extend receipts with their L1 price (if a rollup tx)
+	// Pessimism: extend receipts with their L1 price (if a rollup tx)
 	L1GasPrice *hexutil.Big
 	L1GasUsed  *hexutil.Big
 	L1Fee      *hexutil.Big
@@ -126,11 +126,11 @@ type storedReceiptRLP struct {
 	DepositNonce *uint64 `rlp:"optional"`
 }
 
-// LegacyOptimismStoredReceiptRLP is the pre bedrock storage encoding of a
+// LegacyPessimismStoredReceiptRLP is the pre bedrock storage encoding of a
 // receipt. It will only exist in the database if it was migrated using the
 // migration tool. Nodes that sync using snap-sync will not have any of these
 // entries.
-type LegacyOptimismStoredReceiptRLP struct {
+type LegacyPessimismStoredReceiptRLP struct {
 	PostStateOrStatus []byte
 	CumulativeGasUsed uint64
 	Logs              []*LogForStorage
@@ -390,15 +390,15 @@ func (r *ReceiptForStorage) DecodeRLP(s *rlp.Stream) error {
 	if err != nil {
 		return err
 	}
-	// First try to decode the latest receipt database format, try the pre-bedrock Optimism legacy format otherwise.
+	// First try to decode the latest receipt database format, try the pre-bedrock Pessimism legacy format otherwise.
 	if err := decodeStoredReceiptRLP(r, blob); err == nil {
 		return nil
 	}
-	return decodeLegacyOptimismReceiptRLP(r, blob)
+	return decodeLegacyPessimismReceiptRLP(r, blob)
 }
 
-func decodeLegacyOptimismReceiptRLP(r *ReceiptForStorage, blob []byte) error {
-	var stored LegacyOptimismStoredReceiptRLP
+func decodeLegacyPessimismReceiptRLP(r *ReceiptForStorage, blob []byte) error {
+	var stored LegacyPessimismStoredReceiptRLP
 	if err := rlp.DecodeBytes(blob, &stored); err != nil {
 		return err
 	}
@@ -524,7 +524,7 @@ func (rs Receipts) DeriveFields(config *params.ChainConfig, hash common.Hash, nu
 			logIndex++
 		}
 	}
-	if config.Optimism != nil && len(txs) >= 2 { // need at least an info tx and a non-info tx
+	if config.Pessimism != nil && len(txs) >= 2 { // need at least an info tx and a non-info tx
 		if data := txs[0].Data(); len(data) >= 4+32*8 { // function selector + 8 arguments to setL1BlockValues
 			l1Basefee := new(big.Int).SetBytes(data[4+32*2 : 4+32*3]) // arg index 2
 			overhead := new(big.Int).SetBytes(data[4+32*6 : 4+32*7])  // arg index 6

@@ -268,10 +268,10 @@ func (e *GenesisMismatchError) Error() string {
 // ChainOverrides contains the changes to chain config.
 type ChainOverrides struct {
 	OverrideShanghai *uint64
-	// optimism
-	OverrideOptimismBedrock  *big.Int
-	OverrideOptimismRegolith *uint64
-	OverrideOptimism         *bool
+	// pessimism
+	OverridePessimismBedrock  *big.Int
+	OverridePessimismRegolith *uint64
+	OverridePessimism         *bool
 }
 
 // SetupGenesisBlock writes or updates the genesis block in db.
@@ -297,22 +297,22 @@ func SetupGenesisBlockWithOverride(db ethdb.Database, triedb *trie.Database, gen
 	}
 	applyOverrides := func(config *params.ChainConfig) {
 		if config != nil {
-			if config.IsOptimism() && config.ChainID != nil && config.ChainID.Cmp(params.OptimismGoerliChainId) == 0 {
-				// Apply Optimism Goerli regolith time
-				config.RegolithTime = &params.OptimismGoerliRegolithTime
+			if config.IsPessimism() && config.ChainID != nil && config.ChainID.Cmp(params.PessimismGoerliChainId) == 0 {
+				// Apply Pessimism Goerli regolith time
+				config.RegolithTime = &params.PessimismGoerliRegolithTime
 			}
 			if overrides != nil && overrides.OverrideShanghai != nil {
 				config.ShanghaiTime = overrides.OverrideShanghai
 			}
-			if overrides != nil && overrides.OverrideOptimismBedrock != nil {
-				config.BedrockBlock = overrides.OverrideOptimismBedrock
+			if overrides != nil && overrides.OverridePessimismBedrock != nil {
+				config.BedrockBlock = overrides.OverridePessimismBedrock
 			}
-			if overrides != nil && overrides.OverrideOptimismRegolith != nil {
-				config.RegolithTime = overrides.OverrideOptimismRegolith
+			if overrides != nil && overrides.OverridePessimismRegolith != nil {
+				config.RegolithTime = overrides.OverridePessimismRegolith
 			}
-			if overrides != nil && overrides.OverrideOptimism != nil {
-				if *overrides.OverrideOptimism {
-					config.Optimism = &params.OptimismConfig{
+			if overrides != nil && overrides.OverridePessimism != nil {
+				if *overrides.OverridePessimism {
+					config.Pessimism = &params.PessimismConfig{
 						EIP1559Elasticity:  10,
 						EIP1559Denominator: 50,
 					}

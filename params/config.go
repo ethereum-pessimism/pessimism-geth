@@ -34,11 +34,11 @@ var (
 	GoerliGenesisHash  = common.HexToHash("0xbf7e331f7f7c1dd2e05159666b3bf8bc7a8a3a9eb1d518969eab529dd9b88c1a")
 )
 
-// Optimism chain config
+// Pessimism chain config
 var (
-	OptimismGoerliChainId = big.NewInt(420)
+	PessimismGoerliChainId = big.NewInt(420)
 	// March 17, 2023 @ 7:00:00 pm UTC
-	OptimismGoerliRegolithTime = uint64(1679079600)
+	PessimismGoerliRegolithTime = uint64(1679079600)
 )
 
 // TrustedCheckpoints associates each known checkpoint with the genesis hash of
@@ -352,12 +352,12 @@ var (
 	}
 	TestRules = TestChainConfig.Rules(new(big.Int), false, 0)
 
-	// This is an Optimism chain config with bedrock starting a block 5, introduced for historical endpoint testing, largely based on the clique config
-	OptimismTestConfig = func() *ChainConfig {
+	// This is an Pessimism chain config with bedrock starting a block 5, introduced for historical endpoint testing, largely based on the clique config
+	PessimismTestConfig = func() *ChainConfig {
 		conf := *AllCliqueProtocolChanges // copy the config
 		conf.Clique = nil
 		conf.BedrockBlock = big.NewInt(5)
-		conf.Optimism = &OptimismConfig{EIP1559Elasticity: 50, EIP1559Denominator: 10}
+		conf.Pessimism = &PessimismConfig{EIP1559Elasticity: 50, EIP1559Denominator: 10}
 		return &conf
 	}()
 )
@@ -455,8 +455,8 @@ type ChainConfig struct {
 	CancunTime   *uint64 `json:"cancunTime,omitempty"`   // Cancun switch time (nil = no fork, 0 = already on cancun)
 	PragueTime   *uint64 `json:"pragueTime,omitempty"`   // Prague switch time (nil = no fork, 0 = already on prague)
 
-	BedrockBlock *big.Int `json:"bedrockBlock,omitempty"` // Bedrock switch block (nil = no fork, 0 = already on optimism bedrock)
-	RegolithTime *uint64  `json:"regolithTime,omitempty"` // Regolith switch time (nil = no fork, 0 = already on optimism regolith)
+	BedrockBlock *big.Int `json:"bedrockBlock,omitempty"` // Bedrock switch block (nil = no fork, 0 = already on pessimism bedrock)
+	RegolithTime *uint64  `json:"regolithTime,omitempty"` // Regolith switch time (nil = no fork, 0 = already on pessimism regolith)
 
 	// TerminalTotalDifficulty is the amount of total difficulty reached by
 	// the network that triggers the consensus upgrade.
@@ -471,8 +471,8 @@ type ChainConfig struct {
 	Ethash *EthashConfig `json:"ethash,omitempty"`
 	Clique *CliqueConfig `json:"clique,omitempty"`
 
-	// Optimism config, nil if not active
-	Optimism *OptimismConfig `json:"optimism,omitempty"`
+	// Pessimism config, nil if not active
+	Pessimism *PessimismConfig `json:"pessimism,omitempty"`
 }
 
 // EthashConfig is the consensus engine configs for proof-of-work based sealing.
@@ -494,15 +494,15 @@ func (c *CliqueConfig) String() string {
 	return "clique"
 }
 
-// OptimismConfig is the optimism config.
-type OptimismConfig struct {
+// PessimismConfig is the pessimism config.
+type PessimismConfig struct {
 	EIP1559Elasticity  uint64 `json:"eip1559Elasticity"`
 	EIP1559Denominator uint64 `json:"eip1559Denominator"`
 }
 
-// String implements the stringer interface, returning the optimism fee config details.
-func (o *OptimismConfig) String() string {
-	return "optimism"
+// String implements the stringer interface, returning the pessimism fee config details.
+func (o *PessimismConfig) String() string {
+	return "pessimism"
 }
 
 // Description returns a human-readable description of ChainConfig.
@@ -516,8 +516,8 @@ func (c *ChainConfig) Description() string {
 	}
 	banner += fmt.Sprintf("Chain ID:  %v (%s)\n", c.ChainID, network)
 	switch {
-	case c.Optimism != nil:
-		banner += "Consensus: Optimism\n"
+	case c.Pessimism != nil:
+		banner += "Consensus: Pessimism\n"
 	case c.Ethash != nil:
 		if c.TerminalTotalDifficulty == nil {
 			banner += "Consensus: Ethash (proof-of-work)\n"
@@ -703,23 +703,23 @@ func (c *ChainConfig) IsRegolith(time uint64) bool {
 	return isTimestampForked(c.RegolithTime, time)
 }
 
-// IsOptimism returns whether the node is an optimism node or not.
-func (c *ChainConfig) IsOptimism() bool {
-	return c.Optimism != nil
+// IsPessimism returns whether the node is an pessimism node or not.
+func (c *ChainConfig) IsPessimism() bool {
+	return c.Pessimism != nil
 }
 
-// IsOptimismBedrock returns true iff this is an optimism node & bedrock is active
-func (c *ChainConfig) IsOptimismBedrock(num *big.Int) bool {
-	return c.IsOptimism() && c.IsBedrock(num)
+// IsPessimismBedrock returns true iff this is an pessimism node & bedrock is active
+func (c *ChainConfig) IsPessimismBedrock(num *big.Int) bool {
+	return c.IsPessimism() && c.IsBedrock(num)
 }
 
-func (c *ChainConfig) IsOptimismRegolith(time uint64) bool {
-	return c.IsOptimism() && c.IsRegolith(time)
+func (c *ChainConfig) IsPessimismRegolith(time uint64) bool {
+	return c.IsPessimism() && c.IsRegolith(time)
 }
 
-// IsOptimismPreBedrock returns true iff this is an optimism node & bedrock is not yet active
-func (c *ChainConfig) IsOptimismPreBedrock(num *big.Int) bool {
-	return c.IsOptimism() && !c.IsBedrock(num)
+// IsPessimismPreBedrock returns true iff this is an pessimism node & bedrock is not yet active
+func (c *ChainConfig) IsPessimismPreBedrock(num *big.Int) bool {
+	return c.IsPessimism() && !c.IsBedrock(num)
 }
 
 // CheckCompatible checks whether scheduled fork transitions have been imported
@@ -884,16 +884,16 @@ func (c *ChainConfig) checkCompatible(newcfg *ChainConfig, headNumber *big.Int, 
 
 // BaseFeeChangeDenominator bounds the amount the base fee can change between blocks.
 func (c *ChainConfig) BaseFeeChangeDenominator() uint64 {
-	if c.Optimism != nil {
-		return c.Optimism.EIP1559Denominator
+	if c.Pessimism != nil {
+		return c.Pessimism.EIP1559Denominator
 	}
 	return DefaultBaseFeeChangeDenominator
 }
 
 // ElasticityMultiplier bounds the maximum gas limit an EIP-1559 block may have.
 func (c *ChainConfig) ElasticityMultiplier() uint64 {
-	if c.Optimism != nil {
-		return c.Optimism.EIP1559Elasticity
+	if c.Pessimism != nil {
+		return c.Pessimism.EIP1559Elasticity
 	}
 	return DefaultElasticityMultiplier
 }
@@ -1030,7 +1030,7 @@ type Rules struct {
 	IsByzantium, IsConstantinople, IsPetersburg, IsIstanbul bool
 	IsBerlin, IsLondon                                      bool
 	IsMerge, IsShanghai, isCancun, isPrague                 bool
-	IsOptimismBedrock, IsOptimismRegolith                   bool
+	IsPessimismBedrock, IsPessimismRegolith                   bool
 }
 
 // Rules ensures c's ChainID is not nil.
@@ -1055,8 +1055,8 @@ func (c *ChainConfig) Rules(num *big.Int, isMerge bool, timestamp uint64) Rules 
 		IsShanghai:       c.IsShanghai(timestamp),
 		isCancun:         c.IsCancun(timestamp),
 		isPrague:         c.IsPrague(timestamp),
-		// Optimism
-		IsOptimismBedrock:  c.IsOptimismBedrock(num),
-		IsOptimismRegolith: c.IsOptimismRegolith(timestamp),
+		// Pessimism
+		IsPessimismBedrock:  c.IsPessimismBedrock(num),
+		IsPessimismRegolith: c.IsPessimismRegolith(timestamp),
 	}
 }

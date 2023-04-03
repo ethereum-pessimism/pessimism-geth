@@ -275,7 +275,7 @@ func (st *StateTransition) preCheck() error {
 		st.gasRemaining += st.msg.GasLimit // Add gas here in order to be able to execute calls.
 		// Don't touch the gas pool for system transactions
 		if st.msg.IsSystemTx {
-			if st.evm.ChainConfig().IsOptimismRegolith(st.evm.Context.Time) {
+			if st.evm.ChainConfig().IsPessimismRegolith(st.evm.Context.Time) {
 				return fmt.Errorf("%w: address %v", ErrSystemTxNotSupported,
 					st.msg.From.Hex())
 			}
@@ -443,7 +443,7 @@ func (st *StateTransition) innerTransitionDb() (*ExecutionResult, error) {
 
 	// if deposit: skip refunds, skip tipping coinbase
 	// Regolith changes this behaviour to report the actual gasUsed instead of always reporting all gas used.
-	if st.msg.IsDepositTx && !rules.IsOptimismRegolith {
+	if st.msg.IsDepositTx && !rules.IsPessimismRegolith {
 		// Record deposits as using all their gas (matches the gas pool)
 		// System Transactions are special & are not recorded as using any gas (anywhere)
 		gasUsed := st.msg.GasLimit
@@ -466,7 +466,7 @@ func (st *StateTransition) innerTransitionDb() (*ExecutionResult, error) {
 		// After EIP-3529: refunds are capped to gasUsed / 5
 		st.refundGas(params.RefundQuotientEIP3529)
 	}
-	if st.msg.IsDepositTx && rules.IsOptimismRegolith {
+	if st.msg.IsDepositTx && rules.IsPessimismRegolith {
 		// Skip coinbase payments for deposit tx in Regolith
 		return &ExecutionResult{
 			UsedGas:    st.gasUsed(),
@@ -490,11 +490,11 @@ func (st *StateTransition) innerTransitionDb() (*ExecutionResult, error) {
 	}
 
 	// Check that we are post bedrock to enable op-geth to be able to create pseudo pre-bedrock blocks (these are pre-bedrock, but don't follow l2 geth rules)
-	// Note optimismConfig will not be nil if rules.IsOptimismBedrock is true
-	if optimismConfig := st.evm.ChainConfig().Optimism; optimismConfig != nil && rules.IsOptimismBedrock {
-		st.state.AddBalance(params.OptimismBaseFeeRecipient, new(big.Int).Mul(new(big.Int).SetUint64(st.gasUsed()), st.evm.Context.BaseFee))
+	// Note pessimismConfig will not be nil if rules.IsPessimismBedrock is true
+	if pessimismConfig := st.evm.ChainConfig().Pessimism; pessimismConfig != nil && rules.IsPessimismBedrock {
+		st.state.AddBalance(params.PessimismBaseFeeRecipient, new(big.Int).Mul(new(big.Int).SetUint64(st.gasUsed()), st.evm.Context.BaseFee))
 		if cost := st.evm.Context.L1CostFunc(st.evm.Context.BlockNumber.Uint64(), st.evm.Context.Time, st.msg.RollupDataGas, st.msg.IsDepositTx); cost != nil {
-			st.state.AddBalance(params.OptimismL1FeeRecipient, cost)
+			st.state.AddBalance(params.PessimismL1FeeRecipient, cost)
 		}
 	}
 
